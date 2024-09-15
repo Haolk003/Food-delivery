@@ -5,10 +5,12 @@ import {
     RegisterResponse,
     ActivationResponse,
     LoginResponse,
+    logoutResponse,
 } from './types/user.type'
-import { BadRequestException } from '@nestjs/common'
+import { BadRequestException, UseGuards } from '@nestjs/common'
 import { User } from './entities/user.entity'
-import { Response } from 'express'
+import { Request, Response } from 'express'
+import { AuthGuard } from './guards/auth.guard'
 
 @Resolver('User')
 export class UserResolver {
@@ -34,7 +36,7 @@ export class UserResolver {
     @Mutation(() => LoginResponse)
     async login(@Args('loginInput') loginDto: LoginDto) {
         const res = await this.userService.login(loginDto)
-        console.log(res)
+
         return res
     }
 
@@ -48,6 +50,18 @@ export class UserResolver {
             context.res,
         )
         return { user }
+    }
+
+    @Query(() => LoginResponse)
+    @UseGuards(AuthGuard)
+    async getLoggedInUser(@Context() context: { req: Request }) {
+        return await this.userService.getLoggedInUser(context.req)
+    }
+
+    @Query(() => logoutResponse)
+    @UseGuards(AuthGuard)
+    async loggout(@Context() context: { req: Request }) {
+        return await this.userService.logout(context.req)
     }
 
     @Query(() => [User])

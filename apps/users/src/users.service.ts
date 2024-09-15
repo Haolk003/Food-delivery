@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { ActivationDto, LoginDto, RegisterDto } from './dto/user.dto'
-import { PrismaService } from '../../../prisma/prima.service'
-import { Response } from 'express'
+import { PrismaService } from '../../../prisma/prisma.service'
+import { Response, Request } from 'express'
 import * as bcrypt from 'bcrypt'
 import { ConfigService } from '@nestjs/config'
 import { EmailService } from './email/email.service'
@@ -137,6 +137,22 @@ export class UsersService {
             }
         }
         return { email, password }
+    }
+
+    async getLoggedInUser(req: Request) {
+        const user = req.user
+        const refresh_token = req.refreshtoken
+        const access_token = req.accesstoken
+
+        return { user, access_token, refresh_token }
+    }
+
+    async logout(req: Request) {
+        req.user = null
+        req.refreshtoken = null
+        req.accesstoken = null
+
+        return { message: 'Logged out successfully!' }
     }
 
     async getUsers() {

@@ -13,12 +13,16 @@ export class TokenSender {
             { id: user.id },
             {
                 secret: this.config.get<string>('ACCESS_TOKEN_KEY'),
+                expiresIn: '1m',
             },
         )
 
         const refresh_token = this.jwt.sign(
             { id: user.id },
-            { secret: this.config.get<string>('REFRESH_TOKEN_KEY') },
+            {
+                secret: this.config.get<string>('REFRESH_TOKEN_KEY'),
+                expiresIn: '2d',
+            },
         )
 
         return { user, access_token, refresh_token }
